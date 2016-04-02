@@ -1,0 +1,19 @@
+{
+    "argv": [
+        "/opt/anaconda2/bin/python",
+        "-m",
+        "ipykernel",
+        "-f",
+        "{connection_file}"
+    ],
+    "display_name": "PySpark Local mode",
+    "env": {
+        "PYSPARK_PYTHON": "/opt/anaconda2/bin/python",
+        "PYSPARK_SUBMIT_ARGS": "--master local pyspark-shell",
+        "PYTHONPATH": "/usr/local/spark/python:/usr/local/spark/python/lib/py4j-0.8.2.1-src.zip",
+        "PYTHONSTARTUP": "/usr/local/spark/python/pyspark/shell.py",
+        "SPARK_HOME": "/usr/local/spark"
+    },
+    "language": "python"
+}
+
