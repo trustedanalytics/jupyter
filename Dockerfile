@@ -2,12 +2,12 @@
 # Distributed under the terms of the Modified BSD License.
 FROM quay.io/trustedanalytics/jupyter-base
 
-MAINTAINER Jupyter Project <jupyter@googlegroups.com>
+MAINTAINER TAP Dev-Ops Team
 
 USER root
 
 # Util to help with kernel spec later
-RUN apt-get -y update && apt-get -y install jq && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get -y update && apt-get -y install && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Spark dependencies
 ENV APACHE_SPARK_VERSION 1.5.0
