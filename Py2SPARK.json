@@ -6,7 +6,7 @@
         "-f",
         "{connection_file}"
     ],
-    "display_name": "PySpark Local mode",
+    "display_name": "PySpark Local mode [Spark 1.5.0, Python 2.7]",
     "env": {
         "PYSPARK_PYTHON": "/opt/anaconda2/bin/python",
         "PYSPARK_SUBMIT_ARGS": "--master local[*] pyspark-shell",
