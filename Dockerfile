@@ -1,5 +1,3 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
 FROM quay.io/trustedanalytics/jupyter-base
 
 MAINTAINER TAP Dev-Ops Team
