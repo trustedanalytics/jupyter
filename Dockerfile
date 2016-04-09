@@ -51,5 +51,11 @@ RUN mkdir -p $CONDA_DIR/share/jupyter/kernels/Py2Spark/
 COPY Py2Spark.json $CONDA_DIR/share/jupyter/kernels/Py2Spark/kernel.json
 RUN chown -R $NB_USER:users $CONDA_DIR/share/
 
+
+ADD jupyter-default-notebooks/notebooks/ $WORKDIR
+
+RUN chown -R $NB_USER:users /home/$NB_USER/jupyter/examples/
+RUN for file in `find /home/$NB_USER/jupyter/examples/ -name "*.ipynb"`; do chmod ao-w $file; done
+
 USER $NB_USER
 
