@@ -15,3 +15,4 @@ The image was split into two parts for faster builds and deploys.
 - ATK libraries
 - Anaconda
 - TAP Help menus
+- Examples from the project jupyter-default-notebooks
