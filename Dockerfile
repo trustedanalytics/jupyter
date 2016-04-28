@@ -55,7 +55,6 @@ RUN chown -R $NB_USER:users $CONDA_DIR/share/
 ADD jupyter-default-notebooks/notebooks/ $WORKDIR
 
 RUN chown -R $NB_USER:users /home/$NB_USER/jupyter/examples/
-RUN chmod -R ao-w /home/$NB_USER/jupyter/examples/
 RUN rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile
 
 USER $NB_USER
