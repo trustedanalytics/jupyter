@@ -31,7 +31,7 @@ USER $NB_USER
 RUN conda install --yes \
     'ipython=4.1*' \
     'ipywidgets=4.1*' \
-    'pandas=0.17*' \
+    'pandas=0.18*' \
     'matplotlib=1.5*' \
     'scipy=0.17*' \
     'seaborn=0.7*' \
