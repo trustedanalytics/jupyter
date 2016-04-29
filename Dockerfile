@@ -38,6 +38,7 @@ RUN conda install --yes \
     'scikit-learn=0.17*' \
     'ipykernel' \
     'pyzmq' \
+    'freetype' \
     && conda clean --all
 
 # Install Python 2 kernel spec into the Python 3 conda environment which
