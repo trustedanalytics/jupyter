@@ -10,7 +10,7 @@ RUN apt-get -y update && apt-get -y install && apt-get clean && rm -rf /var/lib/
 # Spark dependencies
 ENV APACHE_SPARK_VERSION 1.5.0
 RUN apt-get -y update && \
-    apt-get install -y --no-install-recommends openjdk-7-jre-headless && \
+    apt-get install -y --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 RUN cd /tmp && \
@@ -41,7 +41,7 @@ RUN conda install --yes \
     'freetype' \
     && conda clean --all
 
-# Install Python 2 kernel spec into the Python 3 conda environment which
+# Install Python 2 kernel spec into conda environment
 USER root
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
