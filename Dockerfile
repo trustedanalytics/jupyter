@@ -45,13 +45,7 @@ RUN conda install --yes \
 USER root
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
-# Create PySPARK in Local mode entry for Jupyter
-RUN mkdir -p $CONDA_DIR/share/jupyter/kernels/Py2SparkLocalMode/
-COPY Py2SparkLocalMode.json $CONDA_DIR/share/jupyter/kernels/Py2SparkLocalMode/kernel.json
-RUN mkdir -p $CONDA_DIR/share/jupyter/kernels/Py2Spark/
-COPY Py2Spark.json $CONDA_DIR/share/jupyter/kernels/Py2Spark/kernel.json
 RUN chown -R $NB_USER:users $CONDA_DIR/share/
-
 
 ADD jupyter-default-notebooks/notebooks/ $WORKDIR
 
