@@ -52,5 +52,6 @@ ADD jupyter-default-notebooks/notebooks/ $WORKDIR
 RUN chown -R $NB_USER:users /home/$NB_USER/jupyter
 RUN rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile
 
-USER $NB_USER
+# Temporarily run as root user for debugging purposes
+# USER $NB_USER
 
