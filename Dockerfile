@@ -31,8 +31,8 @@ ENV YARN_CONF_DIR $HADOOP_CONF_DIR
 # Creating these directories and links to better match cloudera layout
 RUN mkdir -p /etc/spark/conf.cloudera.spark
 RUN mkdir -p /etc/hadoop/conf.cloudera.yarn
-RUN ln -s $SPARK_CONF_DIR /etc/spark/conf.cloudera.spark
-RUN ln -s $HADOOP_CONF_DIR /etc/hadoop/conf.cloudera.yarn
+RUN ln -s /etc/spark/conf.cloudera.spark $SPARK_CONF_DIR
+RUN ln -s /etc/hadoop/conf.cloudera.yarn $HADOOP_CONF_DIR
 
 # Cloudera config is expecting a classpath.txt
 RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt
