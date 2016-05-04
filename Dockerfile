@@ -37,7 +37,9 @@ RUN ln -s /etc/hadoop/conf.cloudera.yarn $HADOOP_CONF_DIR
 # Cloudera config is expecting a classpath.txt
 RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt
 
-chown -R $NB_USER:users /etc/hadoop /etc/spark
+RUN mkdir /user/spark
+
+RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark
 
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
