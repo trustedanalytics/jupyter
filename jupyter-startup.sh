@@ -11,7 +11,8 @@ if [ ! -z "$SPARK_ON_YARN_CLIENT_CONFIG" ]; then
 	cp yarn-conf/* $HADOOP_CONF_DIR
         
 	#Fix bad variables
-	sed -i  -e "s#{{SPARK_HOME}}#$SPARK_HOME#g" $SPARK_CONF_DIR/spark-env.sh
+	sed -i -e "s#{{SPARK_HOME}}#$SPARK_HOME#g" $SPARK_CONF_DIR/spark-env.sh
+	sed -i -e "s#{{PYTHON_PATH}}#$PYTHON_PATH#g" $SPARK_CONF_DIR/spark-env.sh
 
 	# Fix bad permissions
 	chmod +x $HADOOP_CONF_DIR/topology.py
