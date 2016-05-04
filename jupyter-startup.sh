@@ -24,6 +24,8 @@ if [ ! -z "$SPARK_ON_YARN_CLIENT_CONFIG" ]; then
 	# Fix bad setting
 	sed -i -e 's#/etc/hadoop/conf.cloudera.*/topology.py#/etc/hadoop/conf/topology.py#g' $HADOOP_CONF_DIR/core-site.xml
 
+	# Make sure event log is disabled
+	sed -i -e 's#spark.eventLog.enabled=true#spark.eventLog.enabled=false#g' $SPARK_CONF_DIR/spark-defaults.conf
 fi
 popd
 
