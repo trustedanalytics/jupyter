@@ -27,6 +27,8 @@ ENV PATH $SPARK_HOME/bin:$PATH
 ENV SPARK_CONF_DIR "/etc/spark/conf"
 ENV HADOOP_CONF_DIR "/etc/hadoop/conf"
 ENV YARN_CONF_DIR $HADOOP_CONF_DIR
+RUN mkdir -p $SPARK_CONF_DIR && chown -R $NB_USER:$NB_USER $SPARK_CONF_DIR
+RUN mkdir -p $HADOOP_CONF_DIR && chown -R $NB_USER:$NB_USER $HADOOP_CONF_DIR
 
 COPY ./startup.sh startup.sh
 RUN chmod +x ./startup.sh
