@@ -20,6 +20,10 @@ if [ ! -z "$SPARK_ON_YARN_CLIENT_CONFIG" ]; then
 
 	# Fix bad permissions
 	chmod +x $HADOOP_CONF_DIR/topology.py
+
+	# Fix bad setting
+	sed -i -e 's#/etc/hadoop/conf.cloudera.*/topology.py#/etc/hadoop/conf/topology.py#g' $HADOOP_CONF_DIR/core-site.xml
+
 fi
 popd
 
