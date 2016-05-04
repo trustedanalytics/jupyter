@@ -22,7 +22,8 @@ RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6 spark
 
 # Spark pointers
 ENV SPARK_HOME /usr/local/spark
-ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.8.2.1-src.zip
+ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.8.2.1-src.zip:/opt/cloudera/parcels/CDH/lib/spark/python/lib
+
 ENV PATH $SPARK_HOME/bin:$PATH
 ENV SPARK_CONF_DIR "/etc/spark/conf"
 ENV HADOOP_CONF_DIR "/etc/hadoop/conf"
