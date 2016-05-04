@@ -29,7 +29,7 @@ ENV HADOOP_CONF_DIR "/etc/hadoop/conf"
 ENV YARN_CONF_DIR $HADOOP_CONF_DIR
 
 # Creating these directories and links to better match cloudera layout
-RUN mkdir -p /etc/hadoop/conf.cloudera.spark
+RUN mkdir -p /etc/spark/conf.cloudera.spark
 RUN mkdir -p /etc/hadoop/conf.cloudera.yarn
 RUN ln -s $SPARK_CONF_DIR /etc/spark/conf.cloudera.spark
 RUN ln -s $HADOOP_CONF_DIR /etc/hadoop/conf.cloudera.yarn
