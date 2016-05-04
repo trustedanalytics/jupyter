@@ -37,7 +37,7 @@ RUN ln -s /etc/hadoop/conf.cloudera.yarn $HADOOP_CONF_DIR
 # Cloudera config is expecting a classpath.txt
 RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt
 
-RUN mkdir /user/spark
+RUN mkdir -p /user/spark
 
 RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark
 
