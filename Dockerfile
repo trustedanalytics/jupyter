@@ -27,12 +27,22 @@ ENV PATH $SPARK_HOME/bin:$PATH
 ENV SPARK_CONF_DIR "/etc/spark/conf"
 ENV HADOOP_CONF_DIR "/etc/hadoop/conf"
 ENV YARN_CONF_DIR $HADOOP_CONF_DIR
-RUN mkdir -p $SPARK_CONF_DIR && chown -R $NB_USER:users $SPARK_CONF_DIR
-RUN mkdir -p $HADOOP_CONF_DIR && chown -R $NB_USER:users $HADOOP_CONF_DIR
 
-COPY ./startup.sh startup.sh
-RUN chmod +x ./startup.sh
-CMD ["./startup.sh"] 
+# Creating these directories and links to better match cloudera layout
+RUN mkdir -p /etc/hadoop/conf.cloudera.spark
+RUN mkdir -p /etc/hadoop/conf.cloudera.yarn
+RUN ln -s $SPARK_CONF_DIR /etc/spark/conf.cloudera.spark
+RUN ln -s $HADOOP_CONF_DIR /etc/hadoop/conf.cloudera.yarn
+
+# Cloudera config is expecting a classpath.txt
+RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt
+
+chown -R $NB_USER:users /etc/hadoop /etc/spark
+
+COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
+RUN chmod +x /usr/local/bin/jupyter-startup.sh
+CMD ["/usr/local/bin/jupyter-startup.sh"]
+
 USER $NB_USER
 
 # Install Python 2 packages and kernel spec

@@ -9,7 +9,10 @@ if [ ! -z "$SPARK_ON_YARN_CLIENT_CONFIG" ]; then
 	unzip spark.zip
 	cp spark-conf/* $SPARK_CONF_DIR
 	cp yarn-conf/* $HADOOP_CONF_DIR
-fi;
+        
+	#Fix bad variables
+	sed -i  -e "s#{{SPARK_HOME}}#$SPARK_HOME#g" $SPARK_CONF_DIR/spark-env.sh
+fi
 popd
 
 unset CDH_CONFIG_DIR
