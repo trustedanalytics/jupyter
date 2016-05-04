@@ -24,7 +24,13 @@ RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6 spark
 ENV SPARK_HOME /usr/local/spark
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.8.2.1-src.zip
 ENV PATH $SPARK_HOME/bin:$PATH
+ENV SPARK_CONF_DIR "/etc/spark/conf"
+ENV HADOOP_CONF_DIR "/etc/hadoop/conf"
+ENV YARN_CONF_DIR $HADOOP_CONF_DIR
 
+COPY ./startup.sh startup.sh
+RUN chmod +x ./startup.sh
+CMD ["./startup.sh"] 
 USER $NB_USER
 
 # Install Python 2 packages and kernel spec
