@@ -44,6 +44,9 @@ COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
 CMD ["/usr/local/bin/jupyter-startup.sh"]
 
+COPY ./download-example-notebooks.sh /usr/local/bin/download-example-notebooks.sh
+RUN chmod +x /usr/local/bin/download-example-notebooks.sh
+
 USER $NB_USER
 
 # Install Python 2 packages and kernel spec
