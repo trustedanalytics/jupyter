@@ -8,14 +8,14 @@ USER root
 RUN apt-get -y update && apt-get -y install && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Spark dependencies
-ENV APACHE_SPARK_VERSION 1.5.0
+ENV APACHE_SPARK_VERSION 1.5.2
 RUN apt-get -y update && \
     apt-get install -y --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 RUN cd /tmp && \
         wget -q http://www.apache.org/dist/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6.tgz && \
-        echo "d8d8ac357b9e4198dad33042f46b1bc09865105051ffbd7854ba272af726dffc *spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6.tgz" | sha256sum -c - && \
+        echo "409c4b34f196acc5080b893b0579cda000c192fc4cc9336009395b2a559b676e *spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6.tgz" | sha256sum -c - && \
         tar xzf spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6.tgz -C /usr/local && \
         rm spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6.tgz
 RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6 spark
