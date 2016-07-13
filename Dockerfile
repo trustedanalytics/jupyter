@@ -43,14 +43,14 @@ RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/
 # Set required paths for spark-tk and install the packages
 ENV SPARKTK_HOME /usr/local/spark-tk
 ARG SPARKTK_ZIP="spark-tk*.zip"
-COPY $SPARKTK_ZIP /usr/local/ && \
+COPY $SPARKTK_ZIP /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP $SPARKTK_HOME && \
-RUN rm -rf /usr/local/$SPARKTK_ZIP
+    rm -rf /usr/local/$SPARKTK_ZIP
 
 ARG SPARKTK_MODULE_ARCHIVE="sparktk-*.tar.gz"
-COPY $SPARKTK_MODULE_ARCHIVE /usr/local/ && \
+COPY $SPARKTK_MODULE_ARCHIVE /usr/local/
 RUN pip install /usr/local/$SPARKTK_MODULE_ARCHIVE && \
-RUN rm -rf /usr/local/$SPARKTK_MODULE_ARCHIVE
+    rm -rf /usr/local/$SPARKTK_MODULE_ARCHIVE
 
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
