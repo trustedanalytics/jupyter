@@ -44,7 +44,7 @@ RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/
 ENV SPARKTK_HOME /usr/local/spark-tk
 ARG SPARKTK_ZIP="spark-tk*.zip"
 COPY $SPARKTK_ZIP /usr/local/
-RUN unzip /usr/local/$SPARKTK_ZIP -d $SPARKTK_HOME && \
+RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP
 
 ARG SPARKTK_MODULE_ARCHIVE="sparktk-*.tar.gz"
