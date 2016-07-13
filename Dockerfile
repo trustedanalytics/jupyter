@@ -43,12 +43,12 @@ RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/
 # Set required paths for spark-tk and install the packages
 ENV SPARKTK_HOME /usr/local/spark-tk
 ARG SPARKTK_ZIP="spark-tk*.zip"
-ADD $SPARKTK_ZIP /tmp && \
+COPY $SPARKTK_ZIP /tmp && \
 ADD /tmp/$SPARKTK_ZIP /usr/local/ && \
 RUN rm -rf /tmp/$SPARKTK_ZIP
 
 ARG SPARKTK_MODULE_ARCHIVE="sparktk-*.tar.gz"
-ADD $SPARKTK_MODULE_ARCHIVE /tmp && \
+COPY $SPARKTK_MODULE_ARCHIVE /tmp && \
 RUN pip install /tmp/$SPARKTK_MODULE_ARCHIVE && \
 RUN rm -rf /tmp/$SPARKTK_MODULE_ARCHIVE
 
