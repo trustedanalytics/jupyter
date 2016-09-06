@@ -40,6 +40,8 @@ RUN mkdir -p /user/spark/applicationHistory
 
 RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
 
+RUN chown $NB_USER:users /opt/anaconda2/lib/python2.7/site-packages/zmq/utils/compiler.json
+
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
 CMD ["/usr/local/bin/jupyter-startup.sh"]
@@ -59,8 +61,8 @@ RUN conda install --yes \
     'seaborn=0.7*' \
     'scikit-learn=0.17*' \
     'ipykernel' \
-    'pyzmq' \
     'freetype' \
+    && conda install -f "pyzmq" \
     && conda clean --all
 
 # Install Python 2 kernel spec into conda environment
