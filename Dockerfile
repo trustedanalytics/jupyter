@@ -64,11 +64,11 @@ RUN conda install --yes \
     'freetype' \
     'pyzmq' \
     'pymongo' \
-    'pip'
-
-RUN conda install --yes \
+    'pip' && \
+    conda install --yes \
     -f 'nomkl' && \
     conda clean --all
+
 
 # Install Python 2 kernel spec into conda environment
 USER root
