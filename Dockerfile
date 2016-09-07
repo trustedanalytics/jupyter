@@ -64,7 +64,6 @@ RUN conda install --yes \
     'freetype' \
     'pyzmq' \
     'pymongo' \
-    'nomkl' \
     'pip'
 
 RUN conda install --yes \
