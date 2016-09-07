@@ -53,13 +53,13 @@ USER $NB_USER
 
 # Install Python 2 packages and kernel spec
 RUN conda install --yes \
-    'ipython=4.1*' \
-    'ipywidgets=4.1*' \
-    'pandas=0.18*' \
-    'matplotlib=1.5*' \
-    'scipy=0.17*' \
-    'seaborn=0.7*' \
-    'scikit-learn=0.17*' \
+    'ipython>=4.1*' \
+    'ipywidgets>=4.1*' \
+    'pandas>=0.18*' \
+    'matplotlib>=1.5*' \
+    'scipy>=0.17*' \
+    'seaborn>=0.7*' \
+    'scikit-learn>=0.17*' \
     'ipykernel' \
     'freetype' \
     'pyzmq' \
