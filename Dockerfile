@@ -38,9 +38,11 @@ RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt
 
 RUN mkdir -p /user/spark/applicationHistory
 
-RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
-
-RUN chown -R $NB_USER:users /opt/anaconda2/lib/python2.7/site-packages/
+RUN chown -R $NB_USER:users /etc/hadoop \
+    /etc/spark \ 
+    /user/spark \
+    /usr/local/share/jupyter \
+    /opt/anaconda2/lib/python2.7/site-packages/
 
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
