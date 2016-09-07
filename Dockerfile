@@ -22,7 +22,7 @@ RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop2.6 spark
 
 # Spark pointers
 ENV SPARK_HOME /usr/local/spark
-ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.8.2.1-src.zip:/opt/cloudera/parcels/CDH/lib/spark/python/lib
+ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.9-src.zip:/opt/cloudera/parcels/CDH/lib/spark/python/lib
 ENV PYSPARK_PYTHON python2.7
 
 ENV PATH $SPARK_HOME/bin:$PATH
@@ -40,7 +40,7 @@ RUN mkdir -p /user/spark/applicationHistory
 
 RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
 
-RUN chown -R $NB_USER:users /opt/anaconda2/lib/python2.7/site-packages/zmq/utils
+RUN chown -R $NB_USER:users /opt/anaconda2/
 
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
