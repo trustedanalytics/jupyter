@@ -63,6 +63,7 @@ RUN conda install --yes \
     'ipykernel' \
     'freetype' \
     'pyzmq' \
+    'pip' \
     && conda clean --all
 
 # Install Python 2 kernel spec into conda environment
