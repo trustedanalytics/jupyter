@@ -40,6 +40,8 @@ RUN mkdir -p /user/spark/applicationHistory
 
 RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
 
+RUN chown -R $NB_USER:users /opt/anaconda2/
+
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
 CMD ["/usr/local/bin/jupyter-startup.sh"]
@@ -48,7 +50,6 @@ COPY ./download-example-notebooks.sh /usr/local/bin/download-example-notebooks.s
 RUN chmod +x /usr/local/bin/download-example-notebooks.sh
 
 USER $NB_USER
-RUN chown -R $NB_USER:users /opt/anaconda2/
 
 # Install Python 2 packages and kernel spec
 RUN conda install --yes \
