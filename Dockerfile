@@ -63,6 +63,7 @@ RUN conda install --yes \
     'ipykernel' \
     'freetype' \
     'pyzmq' \
+    'pymongo' \
     'pip' \
     && conda clean --all
 
