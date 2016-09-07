@@ -79,4 +79,4 @@ RUN rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile
 
 USER $NB_USER
 
-pip install trustedanalytics
+RUN pip install trustedanalytics
