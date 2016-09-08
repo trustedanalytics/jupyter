@@ -38,11 +38,9 @@ RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt
 
 RUN mkdir -p /user/spark/applicationHistory
 
-RUN chown -R $NB_USER:users /etc/hadoop \
-    /etc/spark \ 
-    /user/spark \
-    /usr/local/share/jupyter \
-    /opt/anaconda2/lib/python2.7/site-packages/
+RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
+
+RUN chown -R $NB_USER:users /opt/anaconda2/lib/cmake/
 
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
@@ -55,6 +53,7 @@ USER $NB_USER
 
 # Install Python 2 packages and kernel spec
 RUN conda install --yes \
+    'nomkl' \
     'ipython>=4.1*' \
     'ipywidgets>=4.1*' \
     'pandas>=0.18*' \
@@ -66,21 +65,17 @@ RUN conda install --yes \
     'freetype' \
     'pyzmq' \
     'pymongo' \
-    'pip' && \
-    conda install --yes \
-    -f 'nomkl' && \
-    conda clean --all
-
+    'pip' \
+    && conda clean --all
 
 # Install Python 2 kernel spec into conda environment
 USER root
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
-RUN chown -R $NB_USER:users $CONDA_DIR/share/
-
 ADD jupyter-default-notebooks/notebooks/ $WORKDIR
 
-RUN chown -R $NB_USER:users /home/$NB_USER/jupyter
+RUN chown -R $NB_USER:users /home/$NB_USER/jupyter $CONDA_DIR/share/
+
 RUN rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile
 
 USER $NB_USER
