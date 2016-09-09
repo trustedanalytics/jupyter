@@ -1,4 +1,4 @@
-FROM quay.io/trustedanalytics/jupyter-base
+FROM jupyter-base
 
 MAINTAINER TAP Dev-Ops Team
 
@@ -55,17 +55,13 @@ USER $NB_USER
 RUN conda install --yes \
     'nomkl' \
     'ipython>=4.1*' \
-    'ipywidgets>=4.1*' \
     'pandas>=0.18*' \
     'matplotlib>=1.5*' \
     'scipy>=0.17*' \
-    'seaborn>=0.7*' \
     'scikit-learn>=0.17*' \
-    'ipykernel' \
     'freetype' \
     'pyzmq' \
     'pymongo' \
-    'pip' \
     && conda clean --all
 
 # Install Python 2 kernel spec into conda environment
