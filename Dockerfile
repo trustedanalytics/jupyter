@@ -1,4 +1,4 @@
-FROM jupyter-base
+FROM quay.io/ashahba/jupyter-base
 
 MAINTAINER TAP Dev-Ops Team
 
