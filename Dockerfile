@@ -1,5 +1,4 @@
-#FROM quay.io/trustedanalytics/jupyter-base
-FROM jupyter-base
+FROM quay.io/trustedanalytics/jupyter-base
 
 MAINTAINER TAP Dev-Ops Team
 
