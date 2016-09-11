@@ -1,4 +1,5 @@
-FROM quay.io/ashahba/jupyter-base
+#FROM quay.io/trustedanalytics/jupyter-base
+FROM jupyter-base
 
 MAINTAINER TAP Dev-Ops Team
 
@@ -77,3 +78,10 @@ RUN rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile
 USER $NB_USER
 
 RUN pip install trustedanalytics
+
+USER root
+RUN rm -rf `find $CONDA_DIR -name tests -type d` && \
+    rm -rf `find $CONDA_DIR -name test -type d` && \
+    rm -rf `find $COND_DIR -name "*.pyc"`
+
+USER $NB_USER
