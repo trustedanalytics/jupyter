@@ -1,4 +1,5 @@
-FROM quay.io/trustedanalytics/jupyter-base
+#FROM quay.io/trustedanalytics/jupyter-base
+FROM jupyter-base
 
 MAINTAINER TAP Dev-Ops Team
 
@@ -40,7 +41,7 @@ RUN mkdir -p /user/spark/applicationHistory
 
 RUN chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
 
-RUN chown -R $NB_USER:users /opt/anaconda2/lib/python2.7/site-packages/
+RUN chown -R $NB_USER:users /opt/anaconda2/lib/cmake/
 
 COPY ./jupyter-startup.sh /usr/local/bin/jupyter-startup.sh
 RUN chmod +x /usr/local/bin/jupyter-startup.sh
@@ -53,31 +54,34 @@ USER $NB_USER
 
 # Install Python 2 packages and kernel spec
 RUN conda install --yes \
+    'nomkl' \
     'ipython>=4.1*' \
-    'ipywidgets>=4.1*' \
     'pandas>=0.18*' \
     'matplotlib>=1.5*' \
     'scipy>=0.17*' \
-    'seaborn>=0.7*' \
     'scikit-learn>=0.17*' \
-    'ipykernel' \
     'freetype' \
     'pyzmq' \
     'pymongo' \
-    'pip' \
     && conda clean --all
 
 # Install Python 2 kernel spec into conda environment
 USER root
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
-RUN chown -R $NB_USER:users $CONDA_DIR/share/
-
 ADD jupyter-default-notebooks/notebooks/ $WORKDIR
 
-RUN chown -R $NB_USER:users /home/$NB_USER/jupyter
+RUN chown -R $NB_USER:users /home/$NB_USER/jupyter $CONDA_DIR/share/
+
 RUN rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile
 
 USER $NB_USER
 
 RUN pip install trustedanalytics
+
+USER root
+RUN rm -rf `find $CONDA_DIR -name tests -type d` && \
+    rm -rf `find $CONDA_DIR -name test -type d` && \
+    rm -rf `find $COND_DIR -name "*.pyc"`
+
+USER $NB_USER
