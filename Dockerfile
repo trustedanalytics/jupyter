@@ -64,14 +64,6 @@ RUN \
     chown -R $NB_USER:users $HOME/jupyter
 
 
-# Install Python 2 kernelspec into conda environment
-USER root
-COPY jupyter-default-notebooks/notebooks $HOME/jupyter
-RUN \
-    $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR && \
-    chown -R $NB_USER:users $HOME/jupyter
-
-
 # Set required paths for spark-tk and install the packages
 ENV SPARKTK_HOME /usr/local/sparktk-core
 ARG SPARKTK_ZIP="sparktk-core*.zip"
