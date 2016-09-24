@@ -64,42 +64,16 @@ RUN \
     chown -R $NB_USER:users $HOME/jupyter
 
 
-# Install Python 2 kernelspec into conda environment
-USER root
-COPY jupyter-default-notebooks/notebooks $HOME/jupyter
+# Remove un-needed files
 RUN \
-    $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR && \
-    chown -R $NB_USER:users $HOME/jupyter
-
-
-# Set required paths for spark-tk and install the packages
-ENV SPARKTK_HOME /usr/local/sparktk-core
-ARG SPARKTK_ZIP="sparktk-core*.zip"
-ARG SPARKTK_MODULE_ARCHIVE="sparktk-*.tar.gz"
-COPY $SPARKTK_ZIP /usr/local/
-RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
-    rm -rf /usr/local/$SPARKTK_ZIP
-COPY $SPARKTK_MODULE_ARCHIVE /tmp/
-
-
-# Install trustedanalytics-python-client and spark-tk module
-USER $NB_USER
-RUN \
-    pip install trustedanalytics /tmp/$SPARKTK_MODULE_ARCHIVE
-
-
-# install Graphframe dependencies
-RUN \
-    wget -nv --no-check-certificate \
-    http://dl.bintray.com/spark-packages/maven/graphframes/graphframes/0.1.0-spark1.6/graphframes-0.1.0-spark1.6.jar \
-    -O /tmp/graphframes.zip && \
-    unzip -q /tmp/graphframes.zip -d /tmp/ && \
-    cp -rp /tmp/graphframes $CONDA_DIR/lib/python2.7/site-packages/ 
-
-
-USER root
-RUN \
-    rm -rf /tmp/* && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md
+    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md && \
+    rm -rf `find $CONDA_DIR -name tests -type d` && \
+    rm -rf `find $CONDA_DIR -name test -type d` && \
+    rm -rf `find $COND_DIR -name "*.pyc"`
+
+
+# Install trustedanalytics-python-client and do a final cleanup
+USER $NB_USER
+RUN pip install trustedanalytics
 
