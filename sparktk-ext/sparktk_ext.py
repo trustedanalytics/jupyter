@@ -196,6 +196,7 @@ class DeleteHandler(IPythonHandler):
                             os.remove(os.path.join(root, name))
                         for name in dirs:
                             os.rmdir(os.path.join(root, name))
+                    os.rmdir(app_path)
                 else:
                     self.write("Error, directory %s is in use, please try later" % (app_path))
         else:
