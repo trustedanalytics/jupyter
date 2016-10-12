@@ -53,6 +53,7 @@ RUN \
     'pyzmq' \
     'scikit-learn>=0.17*' \
     'scipy>=0.17*' && \
+    'snakebite==2.11.0' && \
      conda clean --all
 
 
@@ -88,6 +89,9 @@ RUN \
     unzip -q /tmp/graphframes.zip -d /tmp/ && \
     cp -rp /tmp/graphframes $CONDA_DIR/lib/python2.7/site-packages/ 
 
+# copy hdfsclient.py to python2.7 site-packages
+COPY hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
+
 
 # enable jupyter server extention for sparktk
 COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
@@ -98,4 +102,5 @@ RUN \
     rm -rf /tmp/* && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md
+RUN pip install trustedanalytics tabulate==0.7.5
 
