@@ -89,6 +89,10 @@ RUN \
     cp -rp /tmp/graphframes $CONDA_DIR/lib/python2.7/site-packages/ 
 
 
+# enable jupyter server extention for sparktk
+COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
+RUN jupyter serverextension enable sparktk_ext
+
 USER root
 RUN \
     rm -rf /tmp/* && \
