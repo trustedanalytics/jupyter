@@ -53,7 +53,6 @@ RUN \
     'pyzmq' \
     'scikit-learn>=0.17*' \
     'scipy>=0.17*' && \
-    'snakebite==2.11.0' && \
      conda clean --all
 
 
@@ -102,5 +101,5 @@ RUN \
     rm -rf /tmp/* && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md
-RUN pip install trustedanalytics tabulate==0.7.5
+RUN pip install trustedanalytics tabulate==0.7.5 snakebite==2.11.0
 
