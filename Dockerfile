@@ -67,17 +67,17 @@ RUN \
 # Set required paths for spark-tk and install the packages
 ENV SPARKTK_HOME /usr/local/sparktk-core
 ARG SPARKTK_ZIP="sparktk-core*.zip"
-ARG SPARKTK_MODULE_ARCHIVE="sparktk-*.tar.gz"
+ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
 COPY $SPARKTK_ZIP /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
-    rm -rf /usr/local/$SPARKTK_ZIP
-COPY $SPARKTK_MODULE_ARCHIVE /tmp/
+    rm -rf /usr/local/$SPARKTK_ZIP && \
+    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
 
 
 # Install trustedanalytics-python-client and spark-tk module
 USER $NB_USER
 RUN \
-    pip install trustedanalytics /tmp/$SPARKTK_MODULE_ARCHIVE
+    pip install trustedanalytics $SPARKTK_MODULE_ARCHIVE
 
 
 # install Graphframe dependencies
