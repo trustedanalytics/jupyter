@@ -77,16 +77,15 @@ RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
 # Install trustedanalytics-python-client and spark-tk module
 USER $NB_USER
 RUN \
-    pip install trustedanalytics $SPARKTK_MODULE_ARCHIVE
+    pip install $SPARKTK_MODULE_ARCHIVE
 
 
 # install Graphframe dependencies
 RUN \
-    wget -nv --no-check-certificate \
-    http://dl.bintray.com/spark-packages/maven/graphframes/graphframes/0.1.0-spark1.6/graphframes-0.1.0-spark1.6.jar \
-    -O /tmp/graphframes.zip && \
-    unzip -q /tmp/graphframes.zip -d /tmp/ && \
-    cp -rp /tmp/graphframes $CONDA_DIR/lib/python2.7/site-packages/ 
+    unzip -o $SPARKTK_HOME/lib/graphframes-*-spark*.jar "graphframes/*" && \
+    cp -rp graphframes $CONDA_DIR/lib/python2.7/site-packages/ && \
+    rm -rf graphframes 
+
 
 # copy hdfsclient.py to python2.7 site-packages
 COPY hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
@@ -96,10 +95,17 @@ COPY hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
 COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
 RUN jupyter serverextension enable sparktk_ext
 
+
 USER root
 RUN \
     rm -rf /tmp/* && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
     rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md
-RUN pip install trustedanalytics tabulate==0.7.5 snakebite==2.11.0
+
+
+USER $NB_USER
+RUN \
+    pip install trustedanalytics && \
+    tabulate==0.7.5 && \
+    snakebite==2.11.0
 
