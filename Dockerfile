@@ -98,16 +98,18 @@ COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
 RUN jupyter serverextension enable sparktk_ext
 
 
-USER root
-RUN \
-    rm -rf /tmp/* && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md
-
-
+# Install remaining tk packages
 USER $NB_USER
 RUN \
     pip install trustedanalytics && \
     tabulate==0.7.5 && \
-    snakebite==2.11.0
+    snakebite==2.11.0 
+
+
+# Final cleanup
+USER root
+RUN \
+    rm -rf /tmp/* && \
+    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
+    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md 
 
