@@ -64,16 +64,46 @@ RUN \
     chown -R $NB_USER:users $HOME/jupyter
 
 
-# Remove un-needed files
-RUN \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md && \
-    rm -rf `find $CONDA_DIR -name tests -type d` && \
-    rm -rf `find $CONDA_DIR -name test -type d` && \
-    rm -rf `find $COND_DIR -name "*.pyc"`
+# Set required paths for spark-tk and install the packages
+ENV SPARKTK_HOME /usr/local/sparktk-core
+ARG SPARKTK_ZIP="sparktk-core*.zip"
+ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3rc1/sparktk-core-0.7.3.rc1772.zip"
+ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
+RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
+RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
+    rm -rf /usr/local/$SPARKTK_ZIP && \
+    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
+    cd $SPARKTK_HOME; ./install.sh
 
 
-# Install trustedanalytics-python-client and do a final cleanup
+# Install trustedanalytics-python-client and spark-tk module
 USER $NB_USER
-RUN pip install trustedanalytics
+RUN \
+    pip install $SPARKTK_MODULE_ARCHIVE
+
+
+# copy hdfsclient.py to python2.7 site-packages
+COPY hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
+COPY tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
+
+
+# enable jupyter server extention for sparktk
+COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
+RUN jupyter serverextension enable sparktk_ext
+
+
+# Install remaining tk packages
+USER $NB_USER
+RUN \
+    pip install trustedanalytics && \
+    tabulate==0.7.5 && \
+    snakebite==2.11.0 
+
+
+# Final cleanup
+USER root
+RUN \
+    rm -rf /tmp/* && \
+    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
+    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md 
 
