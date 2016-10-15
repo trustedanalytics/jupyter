@@ -66,9 +66,9 @@ RUN \
 
 # Set required paths for spark-tk and install the packages
 ENV SPARKTK_HOME /usr/local/sparktk-core
-ENV SPARKTK_ZIP_URL  
-ENV SPARKTK_ZIP_PACKAGE_NAME 
-ENV SPARKTK_ZIP_FOLDER_NAME 
+ENV SPARKTK_ZIP_URL  https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3rc1/sparktk-core-0.7.3.rc1772.zip
+ENV SPARKTK_ZIP_PACKAGE_NAME sparktk-core-0.7.3.rc1772.zip
+ENV SPARKTK_ZIP_FOLDER_NAME sparktk-core-0.7.3.rc1772
 RUN wget $SPARKTK_ZIP_URL   -O /usr/local/$SPARKTK_ZIP_PACKAGE_NAME --no-check-certificate
 ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
 RUN unzip /usr/local/$SPARKTK_ZIP_PACKAGE_NAME -d /usr/local/ && \
