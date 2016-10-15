@@ -17,12 +17,15 @@ class LsObject(object):
     def _get_formatted_time(self, timestamp):
         return datetime.fromtimestamp(timestamp/1000).strftime("%Y-%m-%d %H:%M")
 
+    def _get_file_type(self, file_type):
+        return '-' if file_type == 'f' else file_type
+
     def __repr__(self):
       
         ls_result = []
         for i in self.data:
             ls_file_stat = OrderedDict()
-            ls_file_stat['permissions'] = '%s%s' % (i['file_type'], self._get_file_permission_as_str(i['permission']))
+            ls_file_stat['permissions'] = '%s%s' % (self._get_file_type(i['file_type']), self._get_file_permission_as_str(i['permission']))
             ls_file_stat['block_replication'] = i['block_replication']
             ls_file_stat['owner'] = i['owner']
             ls_file_stat['group'] = i['group']

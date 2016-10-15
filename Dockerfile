@@ -89,6 +89,7 @@ RUN \
 
 # copy hdfsclient.py to python2.7 site-packages
 COPY hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
+COPY tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
 
 
 # enable jupyter server extention for sparktk
