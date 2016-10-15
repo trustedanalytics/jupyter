@@ -69,23 +69,17 @@ ENV SPARKTK_HOME /usr/local/sparktk-core
 ARG SPARKTK_ZIP="sparktk-core*.zip"
 ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3rc1/sparktk-core-0.7.3.rc1772.zip"
 ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
-ADD $SPARKTK_URL /usr/local/
+RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
-    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
+    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
+    cd $SPARKTK_HOME; ./install.sh
 
 
 # Install trustedanalytics-python-client and spark-tk module
 USER $NB_USER
 RUN \
     pip install $SPARKTK_MODULE_ARCHIVE
-
-
-# install Graphframe dependencies
-RUN \
-    unzip -o $SPARKTK_HOME/lib/graphframes-*-spark*.jar "graphframes/*" && \
-    cp -rp graphframes $CONDA_DIR/lib/python2.7/site-packages/ && \
-    rm -rf graphframes 
 
 
 # copy hdfsclient.py to python2.7 site-packages
