@@ -1,5 +1,5 @@
 #!/bin/bash
-
+BRANCH=$(echo $BRANCH | sed -e "s|tags/||g")
 chmod +x git-asset
 
 URL=$(./git-asset -t $GIT_TOKEN -o trustedanalytics -r spark-tk download  --artifact-type sparktk-java --release-type RC)
@@ -20,6 +20,7 @@ git status
 git diff Dockerfile
 
 git commit -m "update sparktk build" Dockerfile 
+
 
 if [ "$BRANCH" != "" ]; then
 echo git tag -a $BRANCH -m "BRANCH build"
