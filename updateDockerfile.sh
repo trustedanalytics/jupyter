@@ -17,6 +17,8 @@ sed -i "s|ENV SPARKTK_ZIP_PACKAGE_NAME.*|ENV SPARKTK_ZIP_PACKAGE_NAME $SPARKTK_Z
 sed -i "s|ENV SPARKTK_ZIP_FOLDER_NAME.*|ENV SPARKTK_ZIP_FOLDER_NAME $SPARKTK_NAME|g" Dockerfile
 git status
 
+git diff Dockerfile
+
 git commit -m "update sparktk build" Dockerfile 
 
 echo git tag -a $BRANCH  -m "$BRANCH build"
