@@ -77,13 +77,9 @@ class DataCatalog(object):
         else:
             self.uri = uri
         if username is None:
-            self.username = raw_input("Please input user name:")
-        else:
-            self.username = username
+            username = raw_input("Please input user name:")
         if password is None:
-            self.password = getpass.getpass(prompt="Please input password")
-        else:
-            self.password = password
+            password = getpass.getpass(prompt="Please input password:")
         self.client = "cf"
         self.client_password = ""
         self.data_catalog_uri = "data-catalog.%s" % self.uri
@@ -91,16 +87,28 @@ class DataCatalog(object):
         self.api_uri = "api.%s" % self.uri
         self.scheme = "http://"
         tap_catalog_logger.info("Authenticating...")
-        self._get_oauth_token()
+        self.oauth = self._authenticate(username, password)
         tap_catalog_logger.info("Authenticated successfully.")
         
     def _generate_random_string(self, length):
         return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
     
-    def _get_oauth_token(self):
+    def _authenticate(self, username, password):
         headers = {"Accept" : "application/json"}
         uri = "%s%s/oauth/token" % (self.scheme, self.uaa_uri)
-        payload = {"grant_type" : "password", "scope" : "", "username" : self.username, "password" : self.password}
+        payload = {"grant_type" : "password", "scope" : "", "username" : username, "password" : password}
+        auth=(self.client, self.client_password)
+        response = requests.post(uri, headers=headers, params=payload, auth=auth)
+        if response.status_code == httplib.OK:
+            return json.loads(response.text)
+        else:
+            raise Exception("Could not authenticate. Please check the credentials which were used to initialize. Error: %s" % response.text) 
+
+    def _get_access_token(self):
+        refresh_token = self.oauth["refresh_token"]
+        headers = {"Accept" : "application/json"}
+        uri = "%s%s/oauth/token" % (self.scheme, self.uaa_uri)
+        payload = {"grant_type" : "refresh_token", "refresh_token" : refresh_token}
         auth=(self.client, self.client_password)
         response = requests.post(uri, headers=headers, params=payload, auth=auth)
         if response.status_code == httplib.OK:
@@ -109,7 +117,7 @@ class DataCatalog(object):
             raise Exception("Could not authenticate. Please check the credentials which were used to initialize. Error: %s" % response.text) 
     
     def _get_org_uuid(self):
-        oauth_token = self._get_oauth_token()
+        oauth_token = self._get_access_token()
         uri = "%s%s/v2/organizations" % (self.scheme, self.api_uri)
         headers = {"Authorization": "Bearer %s" % oauth_token, "Accept" : "application/json"}
         response = requests.get(uri, headers=headers)
@@ -145,7 +153,7 @@ class DataCatalog(object):
         artifact_path = artifact_path if str.startswith(artifact_path, hdfs_scheme) else "%s%s" % (hdfs_scheme, artifact_path)
         
         headers = {"Accept" : "application/json", "Content-Type" : "application/json"}
-        headers["Authorization"] = "Bearer %s" % self._get_oauth_token()
+        headers["Authorization"] = "Bearer %s" % self._get_access_token()
         rstring = self._generate_random_string(32)
         data_catalog_id = "%s-%s-%s-%s-%s" % (rstring[0:8], rstring[8:12], rstring[12:16], rstring[16:20], rstring[20:32])
         
