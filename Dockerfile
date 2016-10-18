@@ -96,7 +96,7 @@ RUN jupyter serverextension enable sparktk_ext
 # Install remaining tk packages
 USER $NB_USER
 RUN \
-    pip install trustedanalytics && \
+    pip install trustedanalytics \
     tabulate==0.7.5 \
     snakebite==2.11.0 
 
