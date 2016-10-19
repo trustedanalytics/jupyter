@@ -117,6 +117,19 @@ def mark_completed(future):
     update_status(future.driver_path, app_status=APP_STATUS['COMPLETED'])
 
 
+def get_sparktk_submit_jars():
+    extns = ('.jar')
+    sparktk_submit_jars = []
+
+    for root, dirnames, fns in os.walk(os.environ['SPARK_HOME']):
+        sparktk_submit_jars.extend(os.path.join(root, fn) for fn in fns if fn.lower().endswith(extns))
+    for root, dirnames, fns in os.walk(os.environ['SPARKTK_HOME']):
+        sparktk_submit_jars.extend(os.path.join(root, fn) for fn in fns if fn.lower().endswith(extns))
+    sparktk_driver_class_path = os.environ['SPARK_HOME']+"/lib/*:"+os.environ['SPARKTK_HOME']+"/*:"+os.environ['SPARKTK_HOME']+"/dependencies/*"
+
+    return ','.join(sparktk_submit_jars), sparktk_driver_class_path
+
+
 class SparkSubmitHandler(IPythonHandler):
     def post(self):
         driver_path = self.get_argument('driver-path')
@@ -126,7 +139,10 @@ class SparkSubmitHandler(IPythonHandler):
 
         logfile = os.path.dirname(driver_path) + '/' + 'LOG.log'
 
-        exec_string = 'spark-submit %s' % driver_path
+        sparktk_submit_jars, sparktk_driver_class_path = get_sparktk_submit_jars()
+
+        exec_string = 'spark-submit --jars %s --driver-class-path %s %s' %(sparktk_submit_jars, sparktk_driver_class_path, driver_path)
+
         spark_submit(exec_string, logfile, driver_path)
         self.write("SparkSubmit Job Queued\n")
 
