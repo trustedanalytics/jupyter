@@ -32,6 +32,11 @@ RESPONSE = {
 
 
 def update_status(driver_path, app_status=APP_STATUS['COMPLETED']):
+    """
+    :param driver_path: path to the main sparktk/pyspark script in the uploads directory
+    :param app_status: final status of the app after this update written to STATUS_FILE
+    :return: handler to the updated STATUS_FILE
+    """
     app_dir = os.path.dirname(driver_path)
     status_file = open(os.path.dirname(driver_path) + '/' + STATUS_FILE, 'a+w')
     status_file.write('\n')
@@ -50,6 +55,13 @@ def update_status(driver_path, app_status=APP_STATUS['COMPLETED']):
 
 
 class IndexHandler(IPythonHandler):
+    """
+    implements the "hello" REST api endpoint.
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/hello
+    """
+
     def get(self):
         self.write("Hello From Jupyter")
 
@@ -63,7 +75,19 @@ class UploadFormHandler(IPythonHandler):
 
 
 class UploadHandler(IPythonHandler):
+    """
+    implements the "upload" REST api endpoint.
+    currently the only way to upload files to Jupyter is using the upload Form.
+    after each attemp to upload the file(s) are loaded into a directory format like "uploads/dddd" where d is a digit.
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/upload -F "filearg=@/home/ashahba/frame-basics.py"
+    """
+
     def create_upload_dir(self):
+        """
+        :return: name of the directory created that contains uploaded script(s), jars
+        """
         max_dir_len = len('0000')
         i = 0
         dir_name = APP_SETTINGS['UPLOADS_PATH'] + '/%s' % str(i).zfill(max_dir_len)
@@ -99,10 +123,22 @@ class UploadHandler(IPythonHandler):
 
 
 def mark_submitted(driver_path):
+    """
+    updates the STATUS_FILE with a new entry when job is submitted
+    :param driver_path: the path to the main sparktk/pyspark script within the uploads folder
+    :return: None
+    """
     update_status(driver_path, app_status=APP_STATUS['SUBMITTED'])
 
 
 def spark_submit(exec_string, log_file, driver_path):
+    """
+    asynchronously run the pyspark/sparktk submitted script while writing the logs to the log_file for the app
+    :param exec_string: the command that is going to be run
+    :param log_file: the file containing command(script) logs while running
+    :param driver_path: the path to the main sparktk/pyspark script within the uploads folder
+    :return: None
+    """
     print "Entering spark_submit"
     mark_submitted(driver_path)
     pool = Pool(max_workers=1)
@@ -114,10 +150,21 @@ def spark_submit(exec_string, log_file, driver_path):
 
 
 def mark_completed(future):
+    """
+    once the application has finished running, updates the status_file with a new entry for COMPLETED
+    :param future:
+    :return: None
+    """
     update_status(future.driver_path, app_status=APP_STATUS['COMPLETED'])
 
 
+# TODO: this is only a workaround to ublock the spark-submit against sparktk apps while the bug is being fixed.
 def get_sparktk_submit_jars():
+    """
+    spark-submit requires sparktk apps to provide values for both --jars and --driver-class-path options.
+    This function finds these jars.
+    :return: a list of strings and a string to be used for --jars and --driver-class-path command line option values
+    """
     extns = ('.jar')
     sparktk_submit_jars = []
 
@@ -125,33 +172,56 @@ def get_sparktk_submit_jars():
         sparktk_submit_jars.extend(os.path.join(root, fn) for fn in fns if fn.lower().endswith(extns))
     for root, dirnames, fns in os.walk(os.environ['SPARKTK_HOME']):
         sparktk_submit_jars.extend(os.path.join(root, fn) for fn in fns if fn.lower().endswith(extns))
-    sparktk_driver_class_path = os.environ['SPARK_HOME']+"/lib/*:"+os.environ['SPARKTK_HOME']+"/*:"+os.environ['SPARKTK_HOME']+"/dependencies/*"
+    sparktk_driver_class_path = \
+        os.environ['SPARK_HOME'] + \
+        "/lib/*:" + os.environ['SPARKTK_HOME'] \
+        + "/*:" + os.environ['SPARKTK_HOME'] + \
+        "/dependencies/*"
 
     return ','.join(sparktk_submit_jars), sparktk_driver_class_path
 
 
 class SparkSubmitHandler(IPythonHandler):
+    """
+    implements the "spark-submit" REST api end point
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/spark-submit -d "driver-path=uploads/0001/frame-basics.py"
+    """
+
     def post(self):
         driver_path = self.get_argument('driver-path')
 
-        if not os.path.isfile(driver_path):
-            raise Exception("The given path %s is not a valid script" % (driver_path))
-
-        logfile = os.path.dirname(driver_path) + '/' + 'LOG.log'
-
-        sparktk_submit_jars, sparktk_driver_class_path = get_sparktk_submit_jars()
-
-        exec_string = 'spark-submit --jars %s --driver-class-path %s %s' %(sparktk_submit_jars, sparktk_driver_class_path, driver_path)
-
-        spark_submit(exec_string, logfile, driver_path)
-        self.write("SparkSubmit Job Queued\n")
+        if (os.path.isfile(driver_path)):
+            logfile = os.path.dirname(driver_path) + '/' + 'LOG.log'
+            sparktk_submit_jars, sparktk_driver_class_path = get_sparktk_submit_jars()
+            exec_string = 'spark-submit --jars %s --driver-class-path %s %s' % (
+            sparktk_submit_jars, sparktk_driver_class_path, driver_path)
+            spark_submit(exec_string, logfile, driver_path)
+            self.write("SparkSubmit Job Queued\n")
+        else:
+            self.write("The given path %s is not a valid script" % (driver_path))
 
 
 class LogHandler(IPythonHandler):
+    """
+    implements the "logs" REST api endpoint.
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/logs -d "app-path=uploads/0001" -d "offset=1" -d "n=100"
+    """
+
     def post(self):
         app_path = self.get_argument('app-path')
-        offset = int(self.get_argument('offset', '0', True))
-        num_lines = int(self.get_argument('n', '10', True))
+        offset_str = self.get_argument('offset', '0', True)
+        num_lines_str = self.get_argument('n', '10', True)
+
+        try:
+            offset = int(offset_str)
+            num_lines = int(num_lines_str)
+        except ValueError:
+            self.write("both offset and n must be integers.")
+            return
 
         logfile = app_path + '/' + LOG_FILE
         if (os.path.exists(app_path) and os.path.isfile(logfile)):
@@ -165,7 +235,35 @@ class LogHandler(IPythonHandler):
             self.write("Error, app-path %s doesn't exist or no logs exist yet" % (app_path))
 
 
+class StatusHandler(IPythonHandler):
+    """
+    implements the "logs" REST api endpoint.
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/status -d "app-path=uploads/0001"
+    """
+
+    def post(self):
+        app_path = self.get_argument('app-path')
+
+        status_file = app_path + '/' + STATUS_FILE
+        if (os.path.exists(app_path) and os.path.isfile(status_file)):
+            with open(status_file, 'rb') as f:
+                for i, line in enumerate(f):
+                    pass
+                self.write(line)
+        else:
+            self.write("Error, app-path %s doesn't exist or no status exist yet" % (app_path))
+
+
 class RenameHandler(IPythonHandler):
+    """
+    implements the "rename" REST api endpoint.
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/rename -d "app-path=uploads/0001" -d "dst-path=uploads/myapp"
+    """
+
     def post(self):
         app_path = self.get_argument('app-path')
         dst_path = self.get_argument('dst-path')
@@ -182,6 +280,13 @@ class RenameHandler(IPythonHandler):
 
 
 class DeleteHandler(IPythonHandler):
+    """
+    implements the "delete" REST api endpoint.
+
+    Examples:
+        curl http://<JUPYTER_NOTEBOOK_URL>/delete -d "app-path=uploads/0001"
+    """
+
     def post(self):
         app_path = self.get_argument('app-path')
         status_file_path = app_path + '/' + STATUS_FILE
@@ -195,6 +300,7 @@ class DeleteHandler(IPythonHandler):
                         for name in dirs:
                             os.rmdir(os.path.join(root, name))
                     os.rmdir(app_path)
+                    self.write("The app directory %s was successfully deleted" % (app_path))
                 else:
                     self.write("Error, directory %s is in use, please try later" % (app_path))
         else:
@@ -218,5 +324,6 @@ def load_jupyter_server_extension(nb_app):
                              (r"/rename", RenameHandler),
                              (r"/delete", DeleteHandler),
                              (r"/logs", LogHandler),
+                             (r"/status", StatusHandler),
                          ]
                          )
