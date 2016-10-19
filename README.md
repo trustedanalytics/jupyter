@@ -9,6 +9,17 @@ Two images are used:
 
 The image was split into two parts for faster builds and deploys.
 
+## Building the image
+- Build the jupyter-base image first and tag it
+- Pull all the submodules: git submodule update --init --recursive
+- Update the the Dockerfile where it reads: FROM "quay.io/trustedanalytics/jupyter-base" to point to your jupyter-base image tag
+- sudo docker build .
+- Or if you are behind a proxy use this:
+- sudo docker build --build-arg HTTP_PROXY=$http_proxy --build-arg HTTPS_PROXY=$http_proxy --build-arg NO_PROXY=$no_proxy --build-arg http_proxy=$http_proxy --build-arg https_proxy=$http_proxy --build-arg no_proxy=$no_proxy .
+
+## Run the image:
+- sudo docker run -p 8900:8888 YOUR_JUPYTER_IMAGE_TAG
+
 ##Features
 
 - PySpark, Spark Shell
