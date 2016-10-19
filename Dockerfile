@@ -52,7 +52,8 @@ RUN \
     'pymongo' \
     'pyzmq' \
     'scikit-learn>=0.17*' \
-    'scipy>=0.17*' && \
+    'scipy>=0.17*' \
+    'futures' && \
      conda clean --all
 
 
@@ -73,7 +74,8 @@ RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
-    cd $SPARKTK_HOME; ./install.sh
+    cd $SPARKTK_HOME; ./install.sh && \
+    chown -R $NB_USER:users $CONDA_DIR
 
 
 # Install trustedanalytics-python-client and spark-tk module
@@ -82,9 +84,9 @@ RUN \
     pip install $SPARKTK_MODULE_ARCHIVE
 
 
-# copy hdfsclient.py to python2.7 site-packages
-COPY hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
-COPY tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
+# copy misc modules for TAP to python2.7 site-packages
+COPY misc-modules/hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
+COPY misc-modules/tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
 
 
 # enable jupyter server extention for sparktk
