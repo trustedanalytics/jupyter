@@ -52,7 +52,8 @@ RUN \
     'pymongo' \
     'pyzmq' \
     'scikit-learn>=0.17*' \
-    'scipy>=0.17*' && \
+    'scipy>=0.17*' \
+    'futures' && \
      conda clean --all
 
 
@@ -96,7 +97,7 @@ RUN jupyter serverextension enable sparktk_ext
 USER $NB_USER
 RUN \
     pip install trustedanalytics && \
-    tabulate==0.7.5 && \
+    tabulate==0.7.5 \
     snakebite==2.11.0 
 
 
