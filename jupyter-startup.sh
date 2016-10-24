@@ -13,6 +13,7 @@ if [ ! -z "$SPARK_ON_YARN_CLIENT_CONFIG" ]; then
 	# Fix bad variables
 	sed -i -e "s#{{SPARK_HOME}}#$SPARK_HOME#g" $SPARK_CONF_DIR/spark-env.sh
 	sed -i -e "s#{{PYTHON_PATH}}#$PYTHON_PATH#g" $SPARK_CONF_DIR/spark-env.sh
+        sed -i -e "s#{{CDH_PYTHON}}#$PYSPARK_PYTHON#g" $SPARK_CONF_DIR/spark-env.sh
         # Other bad patterns we might need to fix:
         #  {{HADOOP_HOME}}
 	#  {{SPARK_JAR_HDFS_PATH}}
