@@ -1,3 +1,0 @@
-[submodule "jupyter-default-notebooks"]
-	path = jupyter-default-notebooks
-	url = https://github.com/trustedanalytics/jupyter-default-notebooks.git
