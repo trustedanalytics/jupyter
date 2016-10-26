@@ -1,0 +1,3 @@
+[submodule "jupyter-default-notebooks/notebooks/examples/pandas-cookbook"]
+	path = jupyter-default-notebooks/notebooks/examples/pandas-cookbook
+	url = https://github.com/jvns/pandas-cookbook
