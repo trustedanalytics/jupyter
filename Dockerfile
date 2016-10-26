@@ -78,8 +78,7 @@ RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
 
 
 USER $NB_USER
-RUN \
-    cd $SPARKTK_HOME; ./install.sh 
+RUN cd $SPARKTK_HOME; ./install.sh 
 
 
 # Install trustedanalytics-python-client and spark-tk module
