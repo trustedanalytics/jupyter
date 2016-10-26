@@ -58,8 +58,8 @@ RUN \
 
 
 # Install Python 2 kernelspec into conda environment
-USER root
 COPY jupyter-default-notebooks/notebooks $HOME/jupyter
+USER root
 RUN \
     $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR && \
     chown -R $NB_USER:users $HOME/jupyter
@@ -74,12 +74,14 @@ RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
-    cd $SPARKTK_HOME; ./install.sh && \
-    chown -R $NB_USER:users $CONDA_DIR
+    chown $NB_USER:users $SPARKTK_HOME
+
+
+USER $NB_USER
+RUN cd $SPARKTK_HOME; ./install.sh 
 
 
 # Install trustedanalytics-python-client and spark-tk module
-USER $NB_USER
 RUN \
     pip install $SPARKTK_MODULE_ARCHIVE
 
