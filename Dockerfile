@@ -54,11 +54,10 @@ RUN \
 ENV SHELL /bin/bash
 ENV NB_USER vcap
 ENV NB_UID 1000
-RUN useradd -m -s /bin/bash -d /home/$NB_USER -N -u $NB_UID $NB_USER
+ENV HOME /home/$NB_USER
+RUN useradd -m -s /bin/bash -d $HOME -N -u $NB_UID $NB_USER
 ENV CONDA_DIR /opt/anaconda2
-RUN \
-    mkdir -p $CONDA_DIR && \
-    chown $NB_USER:users $CONDA_DIR
+RUN mkdir -p $CONDA_DIR 
 
 
 # Download and Install Miniconda
@@ -66,44 +65,38 @@ ENV CONDA_VERSION 2-4.1.11
 RUN \
     wget -q --no-check-certificate https://repo.continuum.io/miniconda/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -P $CONDA_DIR && \
     bash $CONDA_DIR/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm -rf $CONDA_DIR/Miniconda${CONDA_VERSION}*x86_64.sh && \
-    chown -R $NB_USER:users $CONDA_DIR
+    rm -rf $CONDA_DIR/Miniconda${CONDA_VERSION}*x86_64.sh 
 
-
-USER $NB_USER
+#Add conda binaries to path
 ENV PATH $CONDA_DIR/bin:$PATH
    
 
 # Setup vcap home directory
 RUN \
-    mkdir /home/$NB_USER/work && \
-    mkdir /home/$NB_USER/.jupyter && \
-    mkdir /home/$NB_USER/.local && \
-    echo "cacert=/etc/ssl/certs/ca-certificates.crt" > /home/$NB_USER/.curlrc
-ENV HOME /home/$NB_USER
+    mkdir $HOME/work && \
+    mkdir $HOME/.jupyter && \
+    mkdir $HOME/.local && \
+    echo "cacert=/etc/ssl/certs/ca-certificates.crt" > $HOME/.curlrc
 
 
 # Configure container startup
-USER root
 EXPOSE 8888
 WORKDIR $HOME/jupyter
-RUN \
-    mkdir -p $HOME/jupyter && \
-    chown -R $NB_USER:users $HOME/jupyter
+RUN mkdir -p $HOME/jupyter 
+
+
 COPY assets/start-notebook.sh /usr/local/bin/
-COPY assets/jupyter_notebook_config.py /home/$NB_USER/.jupyter/
+COPY assets/jupyter_notebook_config.py $HOME/.jupyter/
 ENTRYPOINT ["tini", "--"]
 CMD ["start-notebook.sh"]
 
 
 # Copy all files before switching users
-USER $NB_USER
 COPY assets/tapmenu/ $HOME/tapmenu
 RUN conda install curl jupyter
 
 
 # This logo gets displayed within our default notebooks
-USER root
 RUN \
     jupyter-nbextension install $HOME/tapmenu && \
     jupyter-nbextension enable tapmenu/main
@@ -118,14 +111,10 @@ RUN apt-get purge -y 'python3.4*' && \
     conda clean -y --all
     
 
-USER $NB_USER
 RUN mkdir -p $HOME/.jupyter/nbconfig
 
 
 ######### End of Jupyter Base ##########
-
-
-USER root
 
 
 # Install Spark dependencies
@@ -161,7 +150,6 @@ RUN chmod +x /usr/local/bin/jupyter-startup.sh
 CMD ["/usr/local/bin/jupyter-startup.sh"]
 
 
-USER $NB_USER
 RUN mkdir -p $HOME/.jupyter/nbconfig
 
 
@@ -182,10 +170,9 @@ RUN \
 
 # Install Python 2 kernelspec into conda environment
 COPY jupyter-default-notebooks/notebooks $HOME/jupyter
-USER root
-RUN \
-    $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR && \
-    chown -R $NB_USER:users $HOME/jupyter
+
+
+RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
 
 # Set required paths for spark-tk and install the packages
@@ -196,17 +183,14 @@ ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
 RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
-    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
-    chown $NB_USER:users $SPARKTK_HOME
+    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
 
 
-USER $NB_USER
 RUN cd $SPARKTK_HOME; ./install.sh 
 
 
 # Install trustedanalytics-python-client and spark-tk module
-RUN \
-    pip install $SPARKTK_MODULE_ARCHIVE
+RUN pip install $SPARKTK_MODULE_ARCHIVE
 
 
 # copy misc modules for TAP to python2.7 site-packages
@@ -220,7 +204,6 @@ RUN jupyter serverextension enable sparktk_ext
 
 
 # Install remaining tk packages
-USER $NB_USER
 RUN \
     pip install trustedanalytics \
     tabulate==0.7.5 \
@@ -228,9 +211,8 @@ RUN \
 
 
 # Final cleanup
-USER root
 RUN \
     rm -rf /tmp/* && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md 
+    rm -rf $HOME/jupyter/examples/pandas-cookbook/Dockerfile && \
+    rm -rf $HOME/jupyter/examples/pandas-cookbook/README.md 
 
