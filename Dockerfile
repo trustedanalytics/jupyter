@@ -1,8 +1,120 @@
-FROM quay.io/trustedanalytics/jupyter-base
+FROM debian:stable
 
-MAINTAINER TAP Dev-Ops Team
 
-USER root
+ENV DEBIAN_FRONTEND noninteractive
+
+
+# Install required software and tools
+RUN \
+    apt-get update && \
+    apt-get -y upgrade && \
+    apt-get install -yq --no-install-recommends --fix-missing \
+    bzip2 \
+    locales \
+    tar \
+    unzip \
+    vim.tiny \
+    wget
+
+
+# Setup en_US locales to handle non-ASCII characters correctly
+RUN \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+
+
+# Setup some ENV variables and ARGs
+ENV LC_ALL en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
+RUN locale-gen en_US en_US.UTF-8
+ENV dpkg-reconfigure locales
+
+
+# Add jessie-backports repository to install JDK 1.8
+RUN \
+    echo "===> add jessie-backports repository ..." && \
+    echo "deb http://ftp.de.debian.org/debian jessie-backports main" | tee /etc/apt/sources.list.d/openjdk-8-jdk.list && \
+    apt-get update && \
+    echo "===> install Java" && \
+    apt-get install -yq --no-install-recommends --fix-missing openjdk-8-jdk 
+
+
+# define default command
+CMD ["java"]
+
+
+# Install Tini
+RUN \
+    wget -q --no-check-certificate https://github.com/krallin/tini/releases/download/v0.10.0/tini -P /usr/local/bin/ && \
+    chmod +x /usr/local/bin/tini
+
+
+# Create vcap user with UID=1000 and in the 'users' group
+ENV SHELL /bin/bash
+ENV NB_USER vcap
+ENV NB_UID 1000
+ENV HOME /home/$NB_USER
+RUN useradd -m -s /bin/bash -d $HOME -N -u $NB_UID $NB_USER
+ENV CONDA_DIR /opt/anaconda2
+RUN mkdir -p $CONDA_DIR 
+
+
+# Download and Install Miniconda
+ENV CONDA_VERSION 2-4.1.11
+RUN \
+    wget -q --no-check-certificate https://repo.continuum.io/miniconda/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -P $CONDA_DIR && \
+    bash $CONDA_DIR/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm -rf $CONDA_DIR/Miniconda${CONDA_VERSION}*x86_64.sh 
+
+#Add conda binaries to path
+ENV PATH $CONDA_DIR/bin:$PATH
+   
+
+# Setup vcap home directory
+RUN \
+    mkdir $HOME/work && \
+    mkdir $HOME/.jupyter && \
+    mkdir $HOME/.local && \
+    echo "cacert=/etc/ssl/certs/ca-certificates.crt" > $HOME/.curlrc
+
+
+# Configure container startup
+EXPOSE 8888
+WORKDIR $HOME/jupyter
+RUN mkdir -p $HOME/jupyter 
+
+
+COPY assets/start-notebook.sh /usr/local/bin/
+COPY assets/jupyter_notebook_config.py $HOME/.jupyter/
+ENTRYPOINT ["tini", "--"]
+CMD ["start-notebook.sh"]
+
+
+# Copy all files before switching users
+COPY assets/tapmenu/ $HOME/tapmenu
+RUN conda install curl jupyter
+
+
+# This logo gets displayed within our default notebooks
+RUN \
+    jupyter-nbextension install $HOME/tapmenu && \
+    jupyter-nbextension enable tapmenu/main
+COPY assets/TAP-logo.png $CONDA_DIR/lib/python2.7/site-packages/notebook/static/base/images
+
+
+# Final apt cleanup
+RUN apt-get purge -y 'python3.4*' && \
+    apt-get -yq autoremove && \
+    apt-get -yq autoclean && \
+    rm -rf /var/lib/apt/lists/* && \
+    conda clean -y --all
+    
+
+RUN mkdir -p $HOME/.jupyter/nbconfig
+
+
+######### End of Jupyter Base ##########
 
 
 # Install Spark dependencies
@@ -38,7 +150,6 @@ RUN chmod +x /usr/local/bin/jupyter-startup.sh
 CMD ["/usr/local/bin/jupyter-startup.sh"]
 
 
-USER $NB_USER
 RUN mkdir -p $HOME/.jupyter/nbconfig
 
 
@@ -59,10 +170,9 @@ RUN \
 
 # Install Python 2 kernelspec into conda environment
 COPY jupyter-default-notebooks/notebooks $HOME/jupyter
-USER root
-RUN \
-    $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR && \
-    chown -R $NB_USER:users $HOME/jupyter
+
+
+RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
 
 # Set required paths for spark-tk and install the packages
@@ -73,17 +183,14 @@ ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
 RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
-    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
-    chown $NB_USER:users $SPARKTK_HOME
+    ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
 
 
-USER $NB_USER
 RUN cd $SPARKTK_HOME; ./install.sh 
 
 
 # Install trustedanalytics-python-client and spark-tk module
-RUN \
-    pip install $SPARKTK_MODULE_ARCHIVE
+RUN pip install $SPARKTK_MODULE_ARCHIVE
 
 
 # copy misc modules for TAP to python2.7 site-packages
@@ -97,7 +204,6 @@ RUN jupyter serverextension enable sparktk_ext
 
 
 # Install remaining tk packages
-USER $NB_USER
 RUN \
     pip install trustedanalytics \
     tabulate==0.7.5 \
@@ -105,9 +211,8 @@ RUN \
 
 
 # Final cleanup
-USER root
 RUN \
     rm -rf /tmp/* && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/Dockerfile && \
-    rm -rf /home/$NB_USER/jupyter/examples/pandas-cookbook/README.md 
+    rm -rf $HOME/jupyter/examples/pandas-cookbook/Dockerfile && \
+    rm -rf $HOME/jupyter/examples/pandas-cookbook/README.md 
 
