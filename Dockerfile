@@ -4,6 +4,9 @@ FROM debian:stable
 ENV DEBIAN_FRONTEND noninteractive
 
 
+# Add contrib repository
+RUN sed -i 's/$/ contrib/g' /etc/apt/sources.list
+
 # Install required software and tools
 RUN \
     apt-get update && \
