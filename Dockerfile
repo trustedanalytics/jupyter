@@ -141,7 +141,7 @@ RUN mkdir -p $SPARK_CONF_DIR && \
 # Cloudera config is expecting a classpath.txt, also fix some permissions
 RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt && \
     mkdir -p /user/spark/applicationHistory && \
-    chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
+    chown -R $NB_USER:users /user/spark
 
 
 # Fix the entry point

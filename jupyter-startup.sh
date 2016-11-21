@@ -30,5 +30,7 @@ if [ ! -z "$SPARK_ON_YARN_CLIENT_CONFIG" ]; then
 fi
 popd
 
+# make config directory ownership for NB_USER for downloading from CDH
+chown -R $NB_USER:users /etc/hadoop /etc/spark /usr/local/share/jupyter
 unset CDH_CONFIG_DIR
 source /usr/local/bin/start-notebook.sh
