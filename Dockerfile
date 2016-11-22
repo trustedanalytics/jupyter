@@ -173,9 +173,11 @@ RUN \
 
 # Install Python 2 kernelspec into conda environment
 COPY jupyter-default-notebooks/notebooks $HOME/jupyter
-
-
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
+
+
+# Create a symbolick link for pip2.7 between now and upgrade to Python3
+RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
 
 
 # Set required paths for spark-tk and install the packages
