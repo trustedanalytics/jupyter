@@ -4,6 +4,9 @@ FROM debian:stable
 ENV DEBIAN_FRONTEND noninteractive
 
 
+# Add contrib repository
+RUN sed -i 's/$/ contrib/g' /etc/apt/sources.list
+
 # Install required software and tools
 RUN \
     apt-get update && \
@@ -141,7 +144,7 @@ RUN mkdir -p $SPARK_CONF_DIR && \
 # Cloudera config is expecting a classpath.txt, also fix some permissions
 RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt && \
     mkdir -p /user/spark/applicationHistory && \
-    chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
+    chown -R $NB_USER:users /user/spark
 
 
 # Fix the entry point
@@ -170,9 +173,11 @@ RUN \
 
 # Install Python 2 kernelspec into conda environment
 COPY jupyter-default-notebooks/notebooks $HOME/jupyter
-
-
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
+
+
+# Create a symbolick link for pip2.7 between now and upgrade to Python3
+RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
 
 
 # Set required paths for spark-tk and install the packages
