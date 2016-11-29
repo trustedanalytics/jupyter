@@ -183,9 +183,9 @@ RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
 # Set required paths for spark-tk and install the packages
 ENV SPARKTK_HOME /usr/local/sparktk-core
 ARG SPARKTK_ZIP="sparktk-core*.zip"
-ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3rc2/sparktk-core-0.7.3.rc2047.zip"
+ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3/sparktk-core-0.7.3.post2118.zip"
 ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
-RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
+ADD $SPARKTK_URL /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
