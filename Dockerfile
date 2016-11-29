@@ -48,9 +48,9 @@ CMD ["java"]
 
 
 # Install Tini
-RUN \
-    wget -q --no-check-certificate https://github.com/krallin/tini/releases/download/v0.10.0/tini -P /usr/local/bin/ && \
-    chmod +x /usr/local/bin/tini
+ARG TINI_VERSION="v0.13.0"
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/
+RUN chmod +x /usr/bin/tini
 
 
 # Create vcap user with UID=1000 and in the 'users' group
@@ -64,7 +64,7 @@ RUN mkdir -p $CONDA_DIR
 
 
 # Download and Install Miniconda
-ENV CONDA_VERSION 2-4.1.11
+ENV CONDA_VERSION 2-4.2.12
 RUN \
     wget -q --no-check-certificate https://repo.continuum.io/miniconda/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -P $CONDA_DIR && \
     bash $CONDA_DIR/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
