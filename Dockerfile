@@ -64,7 +64,7 @@ RUN mkdir -p $CONDA_DIR
 
 
 # Download and Install Miniconda
-ENV CONDA_VERSION 2-4.2.12
+ARG CONDA_VERSION="2-4.2.12"
 RUN \
     wget -q --no-check-certificate https://repo.continuum.io/miniconda/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -P $CONDA_DIR && \
     bash $CONDA_DIR/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
