@@ -180,7 +180,7 @@ RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
 
 
-# Set required paths for spark-tk and install the packages
+# Set required paths for spark-tk
 ENV SPARKTK_HOME /usr/local/sparktk-core
 ARG SPARKTK_ZIP="sparktk-core*.zip"
 ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3/sparktk-core-0.7.3.post2118.zip"
@@ -191,11 +191,8 @@ RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
 
 
+# Install spark-tk package
 RUN cd $SPARKTK_HOME; ./install.sh 
-
-
-# Install trustedanalytics-python-client and spark-tk module
-RUN pip install $SPARKTK_MODULE_ARCHIVE
 
 
 # copy misc modules for TAP to python2.7 site-packages
