@@ -205,11 +205,16 @@ COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
 RUN jupyter serverextension enable sparktk_ext
 
 
-# Install remaining tk packages
+# Install remaining tk packages and enable jupyter-spark extension
 RUN \
     pip install trustedanalytics \
     tabulate==0.7.5 \
-    snakebite==2.11.0 
+    snakebite==2.11.0 \
+    jupyter-spark && \
+    jupyter serverextension enable --py jupyter_spark && \
+    jupyter nbextension install --py jupyter_spark && \
+    jupyter nbextension enable --py jupyter_spark && \
+    jupyter nbextension enable --py widgetsnbextension
 
 
 # Final cleanup
