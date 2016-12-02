@@ -189,8 +189,8 @@ ARG TKLIBS_INSTALLER="daal-install"
 
 # Install spark-tk/daal-tk packages
 ADD $TKLIBS_INSTALLER /usr/local/
-RUN chmod +x /usr/local/$TKLIBS_INSTALLER && \
-    /usr/local/$TKLIBS_INSTALLER && \
+RUN chmod +x /usr/local/$TKLIBS_INSTALLER
+RUN /usr/local/$TKLIBS_INSTALLER && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
     ln -s /usr/local/daaltk-core-* $DAALTK_HOME && \
     rm -rf /usr/local/$TKLIBS_INSTALLER /usr/local/*.tar.gz
