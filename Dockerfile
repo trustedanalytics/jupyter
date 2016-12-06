@@ -96,7 +96,7 @@ COPY assets/tapmenu/ $HOME/tapmenu
 RUN \
     conda install --yes \
     'curl' \
-    'jupyter' && \
+    'ipython-notebook' && \
      conda clean --all
 
 
