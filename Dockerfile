@@ -4,6 +4,9 @@ FROM debian:stable
 ENV DEBIAN_FRONTEND noninteractive
 
 
+# Add contrib repository
+RUN sed -i 's/$/ contrib/g' /etc/apt/sources.list
+
 # Install required software and tools
 RUN \
     apt-get update && \
@@ -18,17 +21,13 @@ RUN \
 
 
 # Setup en_US locales to handle non-ASCII characters correctly
-RUN \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen
-
-
-# Setup some ENV variables and ARGs
 ENV LC_ALL en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LANG en_US.UTF-8
-RUN locale-gen en_US en_US.UTF-8
 ENV dpkg-reconfigure locales
+RUN \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
 
 
 # Add jessie-backports repository to install JDK 1.8
@@ -45,9 +44,9 @@ CMD ["java"]
 
 
 # Install Tini
-RUN \
-    wget -q --no-check-certificate https://github.com/krallin/tini/releases/download/v0.10.0/tini -P /usr/local/bin/ && \
-    chmod +x /usr/local/bin/tini
+ARG TINI_VERSION="v0.13.0"
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/
+RUN chmod +x /usr/bin/tini
 
 
 # Create vcap user with UID=1000 and in the 'users' group
@@ -61,7 +60,7 @@ RUN mkdir -p $CONDA_DIR
 
 
 # Download and Install Miniconda
-ENV CONDA_VERSION 2-4.1.11
+ARG CONDA_VERSION="2-4.2.12"
 RUN \
     wget -q --no-check-certificate https://repo.continuum.io/miniconda/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -P $CONDA_DIR && \
     bash $CONDA_DIR/Miniconda${CONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
@@ -93,7 +92,12 @@ CMD ["start-notebook.sh"]
 
 # Copy all files before switching users
 COPY assets/tapmenu/ $HOME/tapmenu
-RUN conda install curl jupyter
+# Install Python 2 packages and kernel spec
+RUN \
+    conda install --yes \
+    'curl' \
+    'ipython-notebook' && \
+     conda clean --all
 
 
 # This logo gets displayed within our default notebooks
@@ -141,7 +145,7 @@ RUN mkdir -p $SPARK_CONF_DIR && \
 # Cloudera config is expecting a classpath.txt, also fix some permissions
 RUN ls $SPARK_HOME/lib/* > $SPARK_CONF_DIR/classpath.txt && \
     mkdir -p /user/spark/applicationHistory && \
-    chown -R $NB_USER:users /etc/hadoop /etc/spark /user/spark /usr/local/share/jupyter
+    chown -R $NB_USER:users /user/spark
 
 
 # Fix the entry point
@@ -156,6 +160,7 @@ RUN mkdir -p $HOME/.jupyter/nbconfig
 # Install Python 2 packages and kernel spec
 RUN \
     conda install --yes \
+    'pip>=9.0.1' \
     'freetype' \
     'matplotlib>=1.5*' \
     'nomkl' \
@@ -170,27 +175,26 @@ RUN \
 
 # Install Python 2 kernelspec into conda environment
 COPY jupyter-default-notebooks/notebooks $HOME/jupyter
-
-
 RUN $CONDA_DIR/bin/python -m ipykernel.kernelspec --prefix=$CONDA_DIR
 
 
-# Set required paths for spark-tk and install the packages
+# Create a symbolick link for pip2.7 between now and upgrade to Python3
+RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
+
+
+# Set required paths for spark-tk
 ENV SPARKTK_HOME /usr/local/sparktk-core
 ARG SPARKTK_ZIP="sparktk-core*.zip"
-ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3rc2/sparktk-core-0.7.3.rc2047.zip"
+ARG SPARKTK_URL="https://github.com/trustedanalytics/spark-tk/releases/download/v0.7.3/sparktk-core-0.7.3.post2118.zip"
 ARG SPARKTK_MODULE_ARCHIVE="$SPARKTK_HOME/python/sparktk-*.tar.gz"
-RUN wget --no-check-certificate -q $SPARKTK_URL -P /usr/local/
+ADD $SPARKTK_URL /usr/local/
 RUN unzip /usr/local/$SPARKTK_ZIP -d /usr/local/ && \
     rm -rf /usr/local/$SPARKTK_ZIP && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME
 
 
+# Install spark-tk package
 RUN cd $SPARKTK_HOME; ./install.sh 
-
-
-# Install trustedanalytics-python-client and spark-tk module
-RUN pip install $SPARKTK_MODULE_ARCHIVE
 
 
 # copy misc modules for TAP to python2.7 site-packages
