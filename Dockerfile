@@ -21,17 +21,13 @@ RUN \
 
 
 # Setup en_US locales to handle non-ASCII characters correctly
-RUN \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen
-
-
-# Setup some ENV variables and ARGs
 ENV LC_ALL en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LANG en_US.UTF-8
-RUN locale-gen en_US en_US.UTF-8
 ENV dpkg-reconfigure locales
+RUN \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
 
 
 # Add jessie-backports repository to install JDK 1.8
@@ -96,7 +92,12 @@ CMD ["start-notebook.sh"]
 
 # Copy all files before switching users
 COPY assets/tapmenu/ $HOME/tapmenu
-RUN conda install curl jupyter
+# Install Python 2 packages and kernel spec
+RUN \
+    conda install --yes \
+    'curl' \
+    'ipython-notebook' && \
+     conda clean --all
 
 
 # This logo gets displayed within our default notebooks
@@ -159,6 +160,7 @@ RUN mkdir -p $HOME/.jupyter/nbconfig
 # Install Python 2 packages and kernel spec
 RUN \
     conda install --yes \
+    'pip>=9.0.1' \
     'freetype' \
     'matplotlib>=1.5*' \
     'nomkl' \
