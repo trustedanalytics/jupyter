@@ -1,5 +1,5 @@
 #!/bin/bash
-BRANCH=$(echo $BRANCH | sed -e "s|tags/||g")
+BRANCH=$1
 
 chmod +x git-asset
 
