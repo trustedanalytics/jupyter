@@ -11,7 +11,9 @@ git clone git@github.com:trustedanalytics/jupyter.git -b $BRANCH $BRANCH
 cp -rp Dockerfile $BRANCH
 
 pushd $BRANCH
+git submodule update --init --recursive
 git status
+
 if [ -n "$(git status --porcelain)" ]; then 
   echo "local changes need to be pushed"
   git add Dockerfile
