@@ -96,7 +96,8 @@ COPY assets/tapmenu/ $HOME/tapmenu
 RUN \
     conda install --yes \
     'curl' \
-    'jupyter' && \
+    'lxml' \
+    'notebook=<4.2.3' && \
      conda clean --all
 
 
