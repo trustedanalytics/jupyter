@@ -200,6 +200,10 @@ RUN /usr/local/$TKLIBS_INSTALLER && \
     rm -rf /usr/local/$TKLIBS_INSTALLER /usr/local/*.tar.gz
 
 
+# Install spark-tk package mainly to fix the graphframes install
+RUN cd $SPARKTK_HOME; ./install.sh
+
+
 # copy misc modules for TAP to python2.7 site-packages
 COPY misc-modules/hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
 COPY misc-modules/tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
