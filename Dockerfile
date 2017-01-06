@@ -201,7 +201,9 @@ RUN /usr/local/$TKLIBS_INSTALLER && \
 
 
 # Install spark-tk package mainly to fix the graphframes install
-RUN cd $SPARKTK_HOME; ./install.sh
+RUN cd $SPARKTK_HOMEi && \
+    chmod +x install.sh && \
+    ./install.sh
 
 
 # copy misc modules for TAP to python2.7 site-packages
