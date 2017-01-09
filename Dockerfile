@@ -187,7 +187,7 @@ RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
 ENV SPARKTK_HOME "/usr/local/sparktk-core"
 ENV DAALTK_HOME "/usr/local/daaltk-core"
 ENV LD_LIBRARY_PATH /usr/local/daal-2016.2.181:$LD_LIBRARY_PATH
-ARG TKLIBS_INSTALLER_URL="https://github.com/trustedanalytics/daal-tk/releases/download/development/daal-install"
+ARG TKLIBS_INSTALLER_URL="https://github.com/trustedanalytics/daal-tk/releases/download/v0.7.4/daal-install"
 ARG TKLIBS_INSTALLER="daal-install"
 
 
