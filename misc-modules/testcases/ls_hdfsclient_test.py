@@ -2,7 +2,6 @@
 
 import unittest
 import hdfsclient
-import os
 
 
 class HDFSClientTest(unittest.TestCase):
@@ -11,8 +10,10 @@ class HDFSClientTest(unittest.TestCase):
         super(HDFSClientTest, self).setUp()
         self.temp_dir = "/user/hadoop/qa_data/temp"
         self.child_dir = "/user/hadoop/qa_data/temp/test"
+        # record the initial contents of the temp folder for later comparison
         ls_res = hdfsclient.ls(self.temp_dir, include_toplevel=False, recurse=True)
         self.temp_dir_file_paths = self._extract_file_paths_from_ls_res(ls_res)
+        # initialize a subdirectory in our temp test directory
         hdfsclient.mkdir(self.child_dir)
 
     def tearDown(self):
@@ -21,19 +22,19 @@ class HDFSClientTest(unittest.TestCase):
     def test_ls_empty_dir_simple(self):
         """tests ls on empty dir no params"""
         ls_res = hdfsclient.ls(self.child_dir)
-        file_paths_list = [line["path"] for line in ls_res.data]
+        file_paths_list = self._extract_file_paths_from_ls_res(ls_res)
         self.assertItemsEqual(file_paths_list, [self.child_dir])
 
     def test_ls_empty_dir_recursive(self):
         """test ls on empty dir with recursive=True"""
         ls_res = hdfsclient.ls(self.child_dir, recurse=True)
-        file_paths_list = [line["path"] for line in ls_res.data]
+        file_paths_list = self._extract_file_paths_from_ls_res(ls_res)
         self.assertItemsEqual(file_paths_list, [self.child_dir])
 
     def test_ls_empty_dir_include_top_level(self):
         """tests ls on empty dir including top lvl"""
         ls_res = hdfsclient.ls(self.child_dir, include_toplevel=True)
-        file_paths_list = [line["path"] for line in ls_res.data]
+        file_paths_list = self._extract_file_paths_from_ls_res(ls_res)
         self.assertItemsEqual(file_paths_list, [self.child_dir])
 
     def test_ls_empty_dir_exclude_top_level(self):
@@ -47,7 +48,7 @@ class HDFSClientTest(unittest.TestCase):
         ls_res = hdfsclient.ls(self.child_dir, include_children=True)
         file_paths_list = self._extract_file_paths_from_ls_res(ls_res)
         self.assertItemsEqual(file_paths_list, [self.child_dir])
-    
+
     def test_ls_empty_dir_exclude_children(self):
         """tests ls on empty dir excluding children"""
         ls_res = hdfsclient.ls(self.child_dir, include_children=False)
@@ -64,7 +65,7 @@ class HDFSClientTest(unittest.TestCase):
         """tests ls with dummy files recursive"""
         ls_res = hdfsclient.ls(self.temp_dir, recurse=True)
         file_paths_list = self._extract_file_paths_from_ls_res(ls_res)
-        expected_res = [self.temp_dir, self.child_dir] + self.temp_dir_file_paths 
+        expected_res = [self.temp_dir, self.child_dir] + self.temp_dir_file_paths
         self.assertItemsEqual(file_paths_list, expected_res)
 
     def test_ls_with_test_files_recursive_exclude_toplevel(self):
@@ -115,6 +116,7 @@ class HDFSClientTest(unittest.TestCase):
         self.assertItemsEqual(file_paths_list, expected_res)
 
     def _extract_file_paths_from_ls_res(self, ls_res):
+        """given an ls res object, return file paths"""
         return [line["path"] for line in ls_res.data]
 
 

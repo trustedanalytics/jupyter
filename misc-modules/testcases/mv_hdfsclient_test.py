@@ -2,7 +2,6 @@
 
 import unittest
 import hdfsclient
-import os
 
 
 class HDFSClientMvTest(unittest.TestCase):
@@ -12,6 +11,7 @@ class HDFSClientMvTest(unittest.TestCase):
         self.temp_dir = "/user/hadoop/qa_data/temp"
         self.child_dir = "/user/hadoop/qa_data/temp/test"
         self.moved_dir = "/user/hadoop/qa_data/temp/test2"
+        # record the initial contents of the temp dir for later comparison
         ls_res = hdfsclient.ls(self.temp_dir, include_toplevel=False, recurse=True)
         self.temp_dir_file_paths = self._extract_file_paths_from_ls_res(ls_res)
         hdfsclient.mkdir(self.child_dir)
@@ -37,12 +37,14 @@ class HDFSClientMvTest(unittest.TestCase):
         hdfsclient.mkdir(self.child_dir + "/innerdir/innerdir", create_parent=True)
         ls_res = hdfsclient.ls(self.temp_dir, recurse=True)
         actual_res = self._extract_file_paths_from_ls_res(ls_res)
-        expected_res = [self.temp_dir, self.child_dir, self.child_dir + "/innerdir", self.child_dir + "/innerdir/innerdir"] + self.temp_dir_file_paths
+        expected_res = [self.temp_dir, self.child_dir, self.child_dir + "/innerdir",
+                        self.child_dir + "/innerdir/innerdir"] + self.temp_dir_file_paths
         self.assertItemsEqual(actual_res, expected_res)
 
     def test_mv_dir_dest_and_src_same(self):
         """tests mv dir with src and dest the same"""
-        with self.assertRaisesRegexp(Exception, "The source " + str(self.child_dir) + " and destination " + str(self.child_dir) + " are the same"):
+        with self.assertRaisesRegexp(Exception, "The source " + str(self.child_dir) +
+                                                " and destination " + str(self.child_dir) + " are the same"):
             hdfsclient.mv(self.child_dir, self.child_dir)
 
     def test_mv_dir_overwrite_is_false_dir_already_exists(self):
@@ -131,7 +133,7 @@ class HDFSClientMvTest(unittest.TestCase):
         self.temp_dir_file_paths.remove(self.temp_dir_file_paths[1])
         ls_res = hdfsclient.ls(self.child_dir)
         file_paths_list = self._extract_file_paths_from_ls_res(ls_res)
-        expected_res = [self.child_dir, self.temp_dir] + self.temp_dir_file_paths 
+        expected_res = [self.child_dir, self.temp_dir] + self.temp_dir_file_paths
         self.assertItemsEqual(file_paths_list, expected_res)
 
     def test_mv_file_does_not_exist(self):

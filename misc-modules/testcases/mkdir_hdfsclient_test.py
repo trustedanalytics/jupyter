@@ -2,7 +2,6 @@
 
 import unittest
 import hdfsclient
-import os
 
 
 class HDFSClientMkdirTest(unittest.TestCase):
@@ -41,13 +40,14 @@ class HDFSClientMkdirTest(unittest.TestCase):
         hdfsclient.mkdir(test_dir_path, create_parent=True)
         ls_res = hdfsclient.ls(self.child_dir, recurse=True)
         folder_paths = self._extract_file_paths_from_ls_res(ls_res)
-        expected_res = [self.child_dir, test_dir_path, self.child_dir + "/test", self.child_dir + "/test/test", self.child_dir + "/test/test/test"]
+        expected_res = [self.child_dir, test_dir_path, self.child_dir + "/test",
+                        self.child_dir + "/test/test", self.child_dir + "/test/test/test"]
         self.assertItemsEqual(folder_paths, expected_res)
 
     @unittest.skip("hdfsclient: does not error when dir path doesn't exist")
     def test_mkdir_dir_does_not_exist(self):
         """tests mkdir without create parent param, dir doesn't exist"""
-        test_dir_path = self.child_dir + "/test/testdir"
+        test_dir_path = self.child_dir + "/test/path/doesnt/exist/testdir"
         with self.assertRaisesRegexp(Exception, "does not exist"):
             hdfsclient.mkdir(test_dir_path)
 
