@@ -192,9 +192,11 @@ ARG TKLIBS_INSTALLER="daal-install"
 
 
 # Install spark-tk/daal-tk packages
-ADD $TKLIBS_INSTALLER_URL /usr/local/
-RUN chmod +x /usr/local/$TKLIBS_INSTALLER
-RUN /usr/local/$TKLIBS_INSTALLER && \
+#ADD $TKLIBS_INSTALLER_URL /usr/local/
+RUN cd /usr/local && \ 
+    wget -q --no-check-certificate $TKLIBS_INSTALLER_URL && \
+    chmod +x $TKLIBS_INSTALLER  && \
+    ./$TKLIBS_INSTALLER && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
     ln -s /usr/local/daaltk-core-* $DAALTK_HOME && \
     rm -rf /usr/local/$TKLIBS_INSTALLER /usr/local/*.tar.gz
@@ -207,8 +209,7 @@ RUN cd $SPARKTK_HOME && \
 
 
 # copy misc modules for TAP to python2.7 site-packages
-COPY misc-modules/hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
-COPY misc-modules/tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
+COPY misc-modules/* $CONDA_DIR/lib/python2.7/site-packages/
 
 
 # enable jupyter server extention for sparktk
