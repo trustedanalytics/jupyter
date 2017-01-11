@@ -205,6 +205,7 @@ RUN cd /usr/local && \
 # Install spark-tk package mainly to fix the graphframes install
 RUN cd $SPARKTK_HOME && \
     chmod +x install.sh && \
+    sync && \
     ./install.sh
 
 
