@@ -194,8 +194,9 @@ ARG TKLIBS_INSTALLER="daal-install"
 # Install spark-tk/daal-tk packages
 #ADD $TKLIBS_INSTALLER_URL /usr/local/
 RUN cd /usr/local && \ 
-    wget -q --no-check-certificate $TKLIBS_INSTALLER_URL && \
-    chmod +x $TKLIBS_INSTALLER  && \
+    wget -q --no-check-certificate $TKLIBS_INSTALLER_URL
+RUN chmod +x /usr/local/$TKLIBS_INSTALLER
+RUN cd /usr/local && \
     ./$TKLIBS_INSTALLER && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
     ln -s /usr/local/daaltk-core-* $DAALTK_HOME && \
@@ -204,7 +205,8 @@ RUN cd /usr/local && \
 
 # Install spark-tk package mainly to fix the graphframes install
 RUN cd $SPARKTK_HOME && \
-    chmod +x install.sh && \
+    chmod +x install.sh
+RUN cd $SPARKTK_HOME && \
     ./install.sh
 
 
