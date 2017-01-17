@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:jessie
 
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -33,7 +33,7 @@ RUN \
 # Add jessie-backports repository to install JDK 1.8
 RUN \
     echo "===> add jessie-backports repository ..." && \
-    echo "deb http://ftp.de.debian.org/debian jessie-backports main" | tee /etc/apt/sources.list.d/openjdk-8-jdk.list && \
+    echo "deb http://ftp.debian.org/debian jessie-backports main" | tee /etc/apt/sources.list.d/openjdk-8-jdk.list && \
     apt-get update && \
     echo "===> install Java" && \
     apt-get install -yq --no-install-recommends --fix-missing openjdk-8-jdk 
