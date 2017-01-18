@@ -11,3 +11,4 @@ scipy
 scikit-learn
 pyorient
 trustedanalytics
+hdfs
