@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:jessie
 
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -37,7 +37,7 @@ RUN \
 # Add jessie-backports repository to install JDK 1.8
 RUN \
     echo "===> add jessie-backports repository ..." && \
-    echo "deb http://ftp.de.debian.org/debian jessie-backports main" | tee /etc/apt/sources.list.d/openjdk-8-jdk.list && \
+    echo "deb http://ftp.debian.org/debian jessie-backports main" | tee /etc/apt/sources.list.d/openjdk-8-jdk.list && \
     apt-get update && \
     echo "===> install Java" && \
     apt-get install -yq --no-install-recommends --fix-missing openjdk-8-jdk 
@@ -192,26 +192,34 @@ RUN ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip2.7
 ENV SPARKTK_HOME "/usr/local/sparktk-core"
 ENV DAALTK_HOME "/usr/local/daaltk-core"
 ENV LD_LIBRARY_PATH /usr/local/daal-2016.2.181:$LD_LIBRARY_PATH
-ARG TKLIBS_INSTALLER_URL="https://github.com/trustedanalytics/daal-tk/releases/download/development/daal-install"
+ARG TKLIBS_INSTALLER_URL="https://github.com/trustedanalytics/daal-tk/releases/download/v0.7.4/daal-install"
 ARG TKLIBS_INSTALLER="daal-install"
 
 
 # Install spark-tk/daal-tk packages
-ADD $TKLIBS_INSTALLER_URL /usr/local/
-RUN chmod +x /usr/local/$TKLIBS_INSTALLER
-RUN /usr/local/$TKLIBS_INSTALLER && \
+#ADD $TKLIBS_INSTALLER_URL /usr/local/
+RUN cd /usr/local && \ 
+    wget -q --no-check-certificate $TKLIBS_INSTALLER_URL && \
+    chmod +x $TKLIBS_INSTALLER  && \
+    sync && \
+    ./$TKLIBS_INSTALLER && \
     ln -s /usr/local/sparktk-core-* $SPARKTK_HOME && \
     ln -s /usr/local/daaltk-core-* $DAALTK_HOME && \
     rm -rf /usr/local/$TKLIBS_INSTALLER /usr/local/*.tar.gz
 
 
+# Install spark-tk package mainly to fix the graphframes install
+RUN cd $SPARKTK_HOME && \
+    chmod +x install.sh && \
+    sync && \
+    ./install.sh
+
+
 # copy misc modules for TAP to python2.7 site-packages
-COPY misc-modules/hdfsclient.py $CONDA_DIR/lib/python2.7/site-packages/
-COPY misc-modules/tap_catalog.py $CONDA_DIR/lib/python2.7/site-packages/
+COPY misc-modules/* $CONDA_DIR/lib/python2.7/site-packages/
 
 
 # enable jupyter server extention for sparktk
-COPY sparktk-ext/* $CONDA_DIR/lib/python2.7/site-packages/
 RUN jupyter serverextension enable sparktk_ext
 
 
