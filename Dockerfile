@@ -12,6 +12,10 @@ RUN \
     apt-get update && \
     apt-get -y upgrade && \
     apt-get install -yq --no-install-recommends --fix-missing \
+    build-essential \
+    libsasl2-dev \
+    libkrb5-dev \
+    libsasl2-modules-gssapi-mit \ 
     bzip2 \
     locales \
     tar \
@@ -164,6 +168,7 @@ RUN \
     'pip>=9.0.1' \
     'freetype' \
     'matplotlib>=1.5*' \
+    'lxml' \
     'nomkl' \
     'pandas>=0.18*' \
     'pymongo' \
@@ -222,7 +227,7 @@ RUN jupyter serverextension enable sparktk_ext
 RUN \
     pip install trustedanalytics \
     tabulate==0.7.5 \
-    snakebite==2.11.0 
+    snakebite[kerberos]
 
 
 # Final cleanup
