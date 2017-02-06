@@ -36,7 +36,7 @@ RUN \
     echo "deb http://ftp.debian.org/debian jessie-backports main" | tee /etc/apt/sources.list.d/openjdk-8-jdk.list && \
     apt-get update && \
     echo "===> install Java" && \
-    apt install -t jessie-backports -yq --no-install-recommends --fix-missing openjdk-8-jre-headless ca-certificates-java
+    apt install -t jessie-backports -yq --no-install-recommends --fix-missing openjdk-8-jre-headless ca-certificates-java openjdk-8-jdk
 
 
 # define default command
