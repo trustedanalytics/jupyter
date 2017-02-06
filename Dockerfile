@@ -222,7 +222,8 @@ RUN jupyter serverextension enable sparktk_ext
 RUN \
     pip install trustedanalytics \
     tabulate==0.7.5 \
-    snakebite==2.11.0 
+    snakebite==2.11.0 \
+    tensorflow
 
 
 # Final cleanup
